@@ -5,7 +5,7 @@ Basic setup
 2) I used Postman to send POST and GET requests to the websevice. Link here: 
     - https://www.postman.com/
     - You just need to create an account, then you can uses it in the browser.
-3) To run the program just double click: runtransaction.bat  
+3) To run the program just double click:  runtransaction.bat  in the main directory
 
 Routes
 
