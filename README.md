@@ -19,10 +19,15 @@ Sending Requests
     - Set it to **POST** 
     - paste this url: http://localhost:8080/addtransaction?
     - paste the transaction into the body and hit send
+        - exmaple: { "payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }
 2) Spend Points route
     - Set it to **POST** 
     - paste this url: http://localhost:8080/spendpoints?
-    - paste the the points into the body
+    - paste the the points into the body and hit send
         - example: { "points": 5000 }
+3) View balance route
+    - Set it to **Get** 
+    - paste this url: http://localhost:8080/balance?
+
  
 
