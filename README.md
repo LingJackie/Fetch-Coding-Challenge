@@ -29,5 +29,5 @@ Sending Requests
     - Set it to **Get** 
     - paste this url: http://localhost:8080/balance?
 
- 
+PS. If there is an error Check if **GET** was selected instead of **POST** and vice versa.
 
