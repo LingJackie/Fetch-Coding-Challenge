@@ -3,7 +3,7 @@ package com.example.fetch;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
+import java.util.Map.Entry;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,17 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/")
 public class TransactionController {
 
-	private static final String template = "Hello, %s!";
-	
-	
-	ArrayList<SpendResponse> result;
+	private ArrayList<SpendResponse> result;
 	private ArrayList<Transaction> transactionlst = new ArrayList<Transaction>();
+	private ArrayList<String> blacklist = new ArrayList<String>();//for when a payer's total is less than 0
 	private SpentPoints totalPts =  new SpentPoints(0);
+
+
+	//HELPERS
 	
-	
-	
-	
-	//for testing only so i dont have to painfully enter this manually everytime
+	//for testing only so i dont have to painfully enter this individually everytime
 	private void initArrlst() {
 		transactionlst.add(new Transaction("DANNON", 1000, "2020-11-02T14:00:00Z" ));
 		transactionlst.add(new Transaction("UNILEVER", 200, "2020-10-31T11:00:00Z" ));
@@ -40,9 +38,6 @@ public class TransactionController {
 		
 	}
 	
-	
-	
-	//HELPERS
     private int searchPayer(ArrayList<SpendResponse> arr, String payer){
     	if(arr.size() != 0) {
     		for (int i = 0; i < arr.size(); i++) {
@@ -59,8 +54,8 @@ public class TransactionController {
     //generates new arr with the subtracted points
 	private ArrayList<SpendResponse> processResponse(){
 		int total = totalPts.getPts();
-		
-		
+		blacklistPayer(showBalance());
+	
 		//transactionlst = new ArrayList<Transaction>();
 		//int total = 5000;
 		//initArrlst();
@@ -75,22 +70,23 @@ public class TransactionController {
 			String transPayer = transactionlst.get(i).getPayer();
 			int transPoints = transactionlst.get(i).getPoints();
 			int foundPayerIdx = searchPayer(result, transPayer);
-			
-			if(foundPayerIdx == -1  ) {//if payer not in new arraylist
-				if(total >= transPoints) {
-					result.add(new SpendResponse( transPayer , -transPoints ));
-					total -= transPoints;
-				}else {
-					result.add(new SpendResponse( transPayer , -total ));
-					total = 0;
-				}
-			}else {//if payer is in the new arrlist
-				if(total >= transPoints) {
-					result.set(foundPayerIdx, new SpendResponse(transPayer, 
-							result.get(foundPayerIdx).getPoints() - transPoints));
-					total -= transPoints;
-				}else {
-					return result;
+			if(!blacklist.contains(transPayer)) {
+				if(foundPayerIdx == -1  ) {//if payer not in new arraylist
+					if(total >= transPoints) {
+						result.add(new SpendResponse( transPayer , -transPoints ));
+						total -= transPoints;
+					}else {
+						result.add(new SpendResponse( transPayer , -total ));
+						total = 0;
+					}
+				}else {//if payer is in the new arrlist
+					if(total >= transPoints) {
+						result.set(foundPayerIdx, new SpendResponse(transPayer, 
+								result.get(foundPayerIdx).getPoints() - transPoints));
+						total -= transPoints;
+					}else {
+						return result;
+					}
 				}
 			}
 			/*
@@ -103,7 +99,17 @@ public class TransactionController {
 		
 	}
 	
-	
+	//blacklists payer whose total balance is less than or equal to 0
+	//prevents them from going to negatives
+	private void blacklistPayer(HashMap<String, Integer> map) {
+		for (Entry<String, Integer> entry : map.entrySet()) {
+			if(entry.getValue() <= 0) {
+				blacklist.add(entry.getKey() );
+			}
+		}
+           
+	}
+	//combines all transactions of each payer
 	private HashMap<String, Integer> showBalance(){
 		HashMap<String, Integer> map = new HashMap<String, Integer>();
 		
@@ -115,10 +121,11 @@ public class TransactionController {
 				map.put(t.getPayer(),t.getPoints());
 			}
 		}
+		
+		
 		return map;
 		
 	}
-	
 	
 	
 	//http://localhost:8080/balance?
@@ -137,28 +144,26 @@ public class TransactionController {
 	
 	
 	
-	
 	//http://localhost:8080/addtransaction?
 	//type this: { "payer": "DANNON", "points": 1000, "timestamp": "2020-11-02T14:00:00Z" }
+	/*
 	@PostMapping(value = "/addtransaction")
 	public ArrayList<Transaction> addBalance() {
 		initArrlst();
 		return transactionlst;
-	}
-	/*
+	}*/
 	@PostMapping(value = "/addtransaction")
 	public void addBalance(@RequestBody Transaction t) {
-		transactionlst.add(t);
+		if(t.getPayer() != null && t.getTimestamp() != null) {
+			transactionlst.add(t);
+		}
+		
 	}
-	*/
-	
-	
-	
 	
 	
 	
 	//http://localhost:8080/spendpoints?
-	//type this: { "pts":5000 }
+	//type this: { "points":5000 }
 	@PostMapping(value = "/spendpoints")
 	public ArrayList<SpendResponse> spendPoints(@RequestBody SpentPoints points) {
 		totalPts = points;
@@ -173,33 +178,16 @@ public class TransactionController {
 	  */
 	 
 	
-	@PostMapping(value = "/test")
-    // consumes = MediaType.APPLICATION_JSON_VALUE, 
-     //produces = MediaType.APPLICATION_JSON_VALUE)
-	public ArrayList<SpendResponse> datetest(@RequestBody int points) {
-		//spentPt = points;
-		return processResponse();
-	}
 	
-
 	
-	@GetMapping(value = "/show")
-	public ArrayList<Transaction> show() {
-		
-		Collections.sort(transactionlst);
+	
+	
+	//http://localhost:8080/showtranslst?
+	//for testing only
+	@PostMapping("/showtranslst")
+	public ArrayList<Transaction> showtranslst() {
+		initArrlst();
 		return transactionlst;
 	}
-	
-	
-	
-	
-	
-	/*
-	@GetMapping("/balance")
-	public Transaction balance(@RequestParam(value = "payer") String payer,
-							   @RequestParam(value = "points") int points, 
-							   @RequestParam(value = "timestamp") String timestamp) {
-		return new Transaction(payer, points, timestamp);
-	}*/
 	
 }
