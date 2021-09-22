@@ -7,9 +7,12 @@ Basic setup
     - You just need to create an account, then you can uses it in the browser.
 3) To run the program just double click:  **runtransaction.bat**  in the main directory
 
-Sending Requests
+Postman
 1) To get started with Postman head over to Workspaces on the top left
 2) then click on the plus
 ![big plus](https://user-images.githubusercontent.com/36714045/134416740-e4029a0d-2981-4ecf-9a9d-a37a37551edb.PNG)
-3)Below the url box select Body
+3)Below the url box select **Body**, **raw**, and **JSON**
 ![bodyjson](https://user-images.githubusercontent.com/36714045/134413141-735d94ea-2b9e-4694-a131-636e8966a6d4.PNG)
+
+Sending Requests
+
