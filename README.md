@@ -15,4 +15,14 @@ Postman
 ![bodyjson](https://user-images.githubusercontent.com/36714045/134413141-735d94ea-2b9e-4694-a131-636e8966a6d4.PNG)
 
 Sending Requests
+1) Add transaction route
+    - Set it to **POST** 
+    - paste this url: http://localhost:8080/addtransaction?
+    - paste the transaction into the body and hit send
+2) Spend Points route
+    - Set it to **POST** 
+    - paste this url: http://localhost:8080/spendpoints?
+    - paste the the points into the body
+        - example: { "points": 5000 }
+ 
 
