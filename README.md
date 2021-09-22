@@ -1,6 +1,6 @@
 ## Fetch-Coding-Challenge
 #Basic setup
-1) You need to have the latest version of java so go here:\s\s
+1) You need to have the latest version of java so go here:  
     - https://www.oracle.com/java/technologies/downloads
 2) I used Postman to send POST and GET requests to the websevice. Link here: 
     - https://www.postman.com/
